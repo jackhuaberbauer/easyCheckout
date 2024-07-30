@@ -25,6 +25,7 @@ server.on('upgrade', (request, socket, head) => {
 
 wss.on('connection', (ws, request, sessionId) => {
 	if (!sessions[sessionId]) {
+		console.log(`Creating new session with ID ${sessionId}`);
 		sessions[sessionId] = { clients: [], sessionData: { orders: [], articles: [], nextOrderNo: orderNo } };
 	}
 
