@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>EasyKasse</title>
+		<script defer src="/app.js"></script>
+		<style>
+			body,
+			html {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+			.button-container {
+				display: flex;
+				flex-wrap: wrap;
+				width: 100%;
+			}
+			.button-container button {
+				flex: 1 1 50%;
+				box-sizing: border-box;
+				margin: 0;
+				padding: 20px;
+				font-size: 16px;
+				height: 150px;
+				padding: 10px 20px;
+				cursor: pointer;
+			}
+			#orders {
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+			.order {
+				display: flex;
+				flex-direction: column;
+				padding: 10px;
+				border: 1px solid #ccc;
+				border-radius: 5px;
+				background-color: #f9f9f9;
+				width: 100%; /* You can set a fixed width like 500px if you prefer */
+				
+				max-width: 1000px; /* Adjust this value as needed */
+				box-sizing: border-box; /* Ensure padding and border are included in the width */
+			}
+
+			.orderNo {
+				font-weight: bold;
+				margin-bottom: 0px;
+			}
+
+			.order-content {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.order ul {
+				list-style-type: none;
+				padding: 0;
+				margin: 0;
+			}
+
+			.order ul li {
+				margin: 5px 0;
+			}
+
+			.order button {
+				padding: 10px 20px;
+				background-color: #4caf50;
+				color: white;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+
+			.order button:hover {
+				background-color: #45a049;
+			}
+
+			#total {
+				font-size: 24px;
+				margin: 10px 0;
+				width: 100%;
+				text-align: center;
+			}
+			#admin {
+				display: flex;
+				flex-direction: column;
+			}
+			#articles {
+				display: flex;
+				flex-direction: column;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="content">
+			<div id="admin">
+				<h2>Administration</h2>
+				<input type="text" id="article" placeholder="Artikel" />
+				<input type="number" id="price" placeholder="Preis" />
+				<button id="addArticle">Artikel hinzufügen</button>
+				<div id="articles"></div>
+			</div>
+
+			<div id="kasse">
+				<h2>Kassen-Arbeitsplatz</h2>
+				<div id="articleButtons" class="button-container"></div>
+
+				<ul id="cart"></ul>
+				<button id="addOrder">Bestellung hinzufügen</button>
+			</div>
+			<div id="ausgabe">
+				<h2>Ausgabe-Arbeitsplatz</h2>
+				<ul id="orders"></ul>
+			</div>
+		</div>
+	</body>
+</html>
