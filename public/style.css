@@ -1,12 +1,122 @@
-body,
-html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
+html, body , button{
+    font-family: 'Roboto', sans-serif;
+    font-size: 1em;
+}
+
+input, button {
+    padding: 10px 10px;
+    font-size: 1em;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
+#content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+    /* justify-content: center; */
+	height: 100vh;
+    gap: 10px;
+    box-sizing: border-box;
+}
+
+/* Main sections */
+#content > div {
+    width: 600px;
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
+h2 {
+    margin: 0;   
+}
+
+#admincontrols {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+#articles {
     display: flex;
     flex-direction: column;
-    align-items: center;
+}
+
+
+
+#content #admin {
+	background-color: rgb(253, 205, 205);
+}
+
+#content #kasse {
+	background-color: rgb(255, 255, 241);
+}
+
+#content #ausgabe {
+	background-color: rgb(230, 230, 255);
+}
+#orders {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	padding: 0px;
+}
+
+.order {
+	display: flex;
+	flex-direction: column;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	background-color: #ffffff;
+}
+
+.orderNo {
+	font-weight: bold;
+	margin-bottom: 0px;
+}
+
+.order-content {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.order ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+.order ul li {
+	margin: 5px 0;
+}
+
+.order button {
+	padding: 10px 20px;
+	background-color: #4caf50;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+    box-sizing: border-box;
+}
+
+.order button:disabled {
+    background-color: #cccccc;
+}
+
+.order button:disabled:hover {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.order button:hover {
+	background-color: #45a049;
 }
 
 .button-container {
@@ -26,75 +136,25 @@ html {
     cursor: pointer;
 }
 
-#orders {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.order {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    width: 100%;
-    /* You can set a fixed width like 500px if you prefer */
-
-    max-width: 1000px;
-    /* Adjust this value as needed */
-    box-sizing: border-box;
-    /* Ensure padding and border are included in the width */
-}
-
-.orderNo {
-    font-weight: bold;
-    margin-bottom: 0px;
-}
-
-.order-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.order ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-.order ul li {
-    margin: 5px 0;
-}
-
-.order button {
-    padding: 10px 20px;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.order button:hover {
-    background-color: #45a049;
-}
-
 #total {
-    font-size: 24px;
-    margin: 10px 0;
-    width: 100%;
-    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: 10px;
 }
 
-#admin {
-    display: flex;
-    flex-direction: column;
+#clearCart {
+    background-color: white;
+    border: 1px solid gray;
+    color: black;
 }
 
-#articles {
+.buttonRow {
     display: flex;
-    flex-direction: column;
+    gap: 2px;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.buttonRow #addOrder {
+    flex-grow: 1;
 }

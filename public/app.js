@@ -21,65 +21,90 @@ ws.onmessage = (event) => {
 	console.log('WebSocket message:', event.data);
 	const message = JSON.parse(event.data);
 	if (message.sessionId != sessionId) return;
+	articles = message.sessionData.articles;
+	articles = message.sessionData.articles;
 	if (message.type === 'sessionJoined' || message.type === 'updateOrders') {
 		showOrders(message.sessionData.orders);
-        articles = message.sessionData.articles;
-        showArticleButtons(message.sessionData.articles);
+		showArticleButtons(message.sessionData.articles);
 	}
-    if (message.type === 'updateArticles') {
-        articles = message.sessionData.articles;
-        showArticleButtons(message.sessionData.articles);
-    }
+	if (message.type === 'updateArticles') {
+		showArticleButtons(message.sessionData.articles);
+	}
+
+	const nextOrderNoDiv = document.getElementById('nextOrderNo');
+	nextOrderNoDiv.textContent = `Nächste Bestellung: #${message.sessionData.nextOrderNo}`;
 };
 
-document.getElementById('addArticle').onclick = () => {
-	
-    // @ts-ignore
+document.getElementById('addArticle').onclick = addArticle;
+document.getElementById('price').onkeydown = (event) => {
+	if (event.key === 'Enter') {
+		addArticle();
+		document.getElementById('article').focus();
+	}
+};
+
+function addArticle() {
+	// @ts-ignore
 	const articleTitle = document.getElementById('article').value;
 	// @ts-ignore
 	const price = document.getElementById('price').value;
-	
-    const existingArticle = articles.find((article) => article.title === articleTitle);
-    if (!existingArticle) {
-        articles.push({title: articleTitle, price: parseFloat(price)});
-    	ws.send(JSON.stringify({ type: 'updateArticles', sessionId, articles: articles }));
-    }
+
+	if (!articleTitle || !price) {
+		alert('Bitte fülle alle Felder aus.');
+		return;
+	}
+
+	const existingArticle = articles.find((article) => article.title === articleTitle);
+	if (!existingArticle) {
+		articles.push({ title: articleTitle, price: parseFloat(price) });
+		ws.send(JSON.stringify({ type: 'updateArticles', sessionId, articles: articles }));
+	}
 	// @ts-ignore
 	document.getElementById('article').value = '';
 	// @ts-ignore
 	document.getElementById('price').value = '';
-};
+}
 
 document.getElementById('addOrder').onclick = () => {
 	ws.send(JSON.stringify({ type: 'addOrder', sessionId, cart: cart }));
-	cart = [];
-	updateCart();
+	clearCart();
 };
 
+document.getElementById('clearCart').onclick = clearCart;
+
+function clearCart() {
+	cart = [];
+	updateCart();
+	// @ts-ignore
+	document.getElementById('addOrder').disabled = true;
+}
+
 function showArticleButtons(articles) {
-    const articleList = document.getElementById('articleButtons');
-    articleList.innerHTML = '';
-    articles.forEach((article) => {
-        const button = document.createElement('button');
-        button.textContent = `${article.title} - ${article.price.toFixed(2)} €`;
-        button.onclick = () => {
-            const item = { article: article.title, price: article.price, id: generateUUID() };
-            cart.push(item);
-            updateCart();
-        };
-        articleList.appendChild(button);
-    });
+	const articleList = document.getElementById('articleButtons');
+	articleList.innerHTML = '';
+	articles.forEach((article) => {
+		const button = document.createElement('button');
+		button.textContent = `${article.title} - ${article.price.toFixed(2)} €`;
+		button.onclick = () => {
+			const item = { article: article.title, price: article.price, id: generateUUID() };
+			cart.push(item);
+			updateCart();
+			// @ts-ignore
+			document.getElementById('addOrder').disabled = false;
+		};
+		articleList.appendChild(button);
+	});
 
 	const articleAdminDiv = document.getElementById('articles');
-    articleAdminDiv.innerHTML = '';
-    articles.forEach((article) => {
-        const button = document.createElement('button');
-        button.textContent = `${article.title} - ${article.price.toFixed(2)} € (ENTFERNEN)`;
-        button.onclick = () => {
-            removeArticle(article)
-        };
-        articleAdminDiv.appendChild(button);
-    });
+	articleAdminDiv.innerHTML = '';
+	articles.forEach((article) => {
+		const button = document.createElement('button');
+		button.textContent = `${article.title} - ${article.price.toFixed(2)} € (ENTFERNEN)`;
+		button.onclick = () => {
+			removeArticle(article);
+		};
+		articleAdminDiv.appendChild(button);
+	});
 }
 
 function removeArticle(article) {
@@ -90,11 +115,15 @@ function removeArticle(article) {
 function updateCart() {
 	const cartList = document.getElementById('cart');
 	cartList.innerHTML = '';
-	cart.forEach((item) => {
+	const groupedArticles = getGroupedArticles(cart);
+	groupedArticles.forEach((item) => {
 		const li = document.createElement('li');
-		li.textContent = `${item.article} - ${item.price.toFixed(2)} €`;
+		li.textContent = `${item.count}x ${item.article} - ${item.sum.toFixed(2)} €`;
 		cartList.appendChild(li);
 	});
+	const sum = getArticlesSum(cart);
+	const totalDiv = document.getElementById('total');
+	totalDiv.textContent = `Summe: ${sum.toFixed(2)} €`;
 }
 
 function showOrders(orders) {
@@ -107,22 +136,10 @@ function showOrders(orders) {
 		const div = document.createElement('div');
 		const orderNo = document.createElement('div');
 		orderNo.classList.add('orderNo');
-		orderNo.textContent = `Bestellung ${cart.orderNo}`;
+		orderNo.textContent = `Bestellung #${cart.orderNo}`;
 		div.classList.add('order');
 		const ul = document.createElement('ul');
-		console.log(cart.articles);
-		// group articles with same name and add count
-		const groupedArticles = cart.articles.reduce((acc, item) => {
-			const existingItem = acc.find((groupedItem) => groupedItem.article === item.article);
-			if (existingItem) {
-				existingItem.count++;
-			} else {
-				acc.push({ article: item.article, count: 1 });
-			}
-			return acc;
-		}, []);
-		console.log(groupedArticles);
-
+		const groupedArticles = getGroupedArticles(cart.articles);
 		groupedArticles.forEach((item) => {
 			const itemLi = document.createElement('li');
 			itemLi.textContent = `${item.count}x ${item.article}`;
@@ -134,10 +151,27 @@ function showOrders(orders) {
 			ws.send(JSON.stringify({ type: 'markOrderAsDone', sessionId, cartId: cart.id }));
 		};
 		div.appendChild(orderNo);
-		div.appendChild(ul)
+		div.appendChild(ul);
 		div.appendChild(button);
 		completedCartList.appendChild(div);
 	});
+}
+
+function getGroupedArticles(articles) {
+	return articles.reduce((acc, item) => {
+		const existingItem = acc.find((groupedItem) => groupedItem.article === item.article);
+		if (existingItem) {
+			existingItem.count++;
+			existingItem.sum += item.price;
+		} else {
+			acc.push({ article: item.article, count: 1, price: item.price, sum: item.price });
+		}
+		return acc;
+	}, []);
+}
+
+function getArticlesSum(articles) {
+	return articles.reduce((acc, item) => acc + item.price, 0);
 }
 
 function generateUUID() {

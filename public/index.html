@@ -8,25 +8,36 @@
 		<link rel="stylesheet" href="/style.css" />
 	</head>
 	<body>
-		<div id="content">
-			<div id="admin">
-				<h2>Administration</h2>
-				<input type="text" id="article" placeholder="Artikel" />
-				<input type="number" id="price" placeholder="Preis" />
-				<button id="addArticle">Artikel hinzufügen</button>
-				<div id="articles"></div>
-			</div>
+		<div id="wrap">
+			<div id="content">
+				<div id="admin">
+					<h2>Administration</h2>
+					<div id="admincontrols">
+						<input type="text" id="article" placeholder="Artikel" />
+						<input type="number" id="price" placeholder="Preis" />
+						<button id="addArticle">Artikel hinzufügen</button>
+					</div>
+					<div id="articles"></div>
+				</div>
 
-			<div id="kasse">
-				<h2>Kassen-Arbeitsplatz</h2>
-				<div id="articleButtons" class="button-container"></div>
+				<div id="kasse">
+					<h2>Kasse</h2>
+					<div id="articleButtons" class="button-container"></div>
 
-				<ul id="cart"></ul>
-				<button id="addOrder">Bestellung hinzufügen</button>
-			</div>
-			<div id="ausgabe">
-				<h2>Ausgabe-Arbeitsplatz</h2>
-				<ul id="orders"></ul>
+					<div class="order">
+						<div id="nextOrderNo" class="orderNo">xxx</div>
+						<ul id="cart"></ul>
+						<div id="total">0.00 €</div>
+						<div class="buttonRow">
+							<button id="addOrder" disabled="true">Bestellung hinzufügen</button>
+							<button id="clearCart">🗑️</button>
+						</div>
+					</div>
+				</div>
+				<div id="ausgabe">
+					<h2>Ausgabe</h2>
+					<ul id="orders"></ul>
+				</div>
 			</div>
 		</div>
 	</body>

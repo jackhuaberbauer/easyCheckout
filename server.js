@@ -25,7 +25,7 @@ server.on('upgrade', (request, socket, head) => {
 
 wss.on('connection', (ws, request, sessionId) => {
 	if (!sessions[sessionId]) {
-		sessions[sessionId] = { clients: [], sessionData: { orders: [], articles: [] } };
+		sessions[sessionId] = { clients: [], sessionData: { orders: [], articles: [], nextOrderNo: orderNo } };
 	}
 
 	ws.on('message', (message) => {
@@ -34,7 +34,6 @@ wss.on('connection', (ws, request, sessionId) => {
 	});
 
 	sessions[sessionId].clients.push(ws);
-	// ws.send(JSON.stringify({ type: 'sessionJoined', sessionId, sessionData: sessions[sessionId].sessionData }));
 	broadcastToSession(sessionId, 'sessionJoined');
 });
 
@@ -92,6 +91,7 @@ function getSession(sessionId) {
 
 function broadcastToSession(sessionId, type) {
 	const session = getSession(sessionId);
+	session.sessionData.nextOrderNo = orderNo;
 	session.clients.forEach((client) => {
 		if (client.readyState === WebSocket.OPEN) {
 			client.send(JSON.stringify({ sessionId, type, sessionData: session.sessionData }));
