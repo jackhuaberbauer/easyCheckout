@@ -3,7 +3,7 @@ const WebSocket = require('ws');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 4000;
 const wss = new WebSocket.Server({ noServer: true });
 app.use(express.static('public'));
 
