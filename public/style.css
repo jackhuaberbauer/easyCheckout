@@ -1,6 +1,7 @@
 html, body , button{
     font-family: 'Roboto', sans-serif;
     font-size: 1em;
+    padding: 2px;
 }
 
 input, button {
@@ -22,7 +23,8 @@ input, button {
 
 /* Main sections */
 #content > div {
-    width: 600px;
+    width: 100%;
+    max-width: 800px;
     padding: 10px;
     border: 1px solid gray;
     border-radius: 5px;
@@ -37,6 +39,8 @@ h2 {
     margin-bottom: 5px;
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap
+    
 }
 
 #articles {

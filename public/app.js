@@ -1,7 +1,9 @@
 const pathParts = window.location.pathname.split('/');
 const workplaceType = pathParts[1]; // 'kasse' or 'ausgabe'
 const sessionId = pathParts[2];
-const ws = new WebSocket(`wss://${window.location.host}/${workplaceType}/${sessionId}`);
+const webSocketUrl =
+	window.location.host == 'localhost:4000' ? `ws://${window.location.host}/${workplaceType}/${sessionId}` : `wss://${window.location.host}/${workplaceType}/${sessionId}`;
+const ws = new WebSocket(webSocketUrl);
 let cart = [];
 let articles = [];
 
