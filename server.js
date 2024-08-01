@@ -8,10 +8,9 @@ const wss = new WebSocket.Server({ noServer: true });
 app.use(express.static('public'));
 
 let sessions = {};
-let orderNo = 1;
 
 const server = app.listen(port, () => {
-	console.log(`Server is running on http://localhost:${port}`);
+	console.log(`Server is running on port  ${port}`);
 });
 
 server.on('upgrade', (request, socket, head) => {
@@ -26,7 +25,9 @@ server.on('upgrade', (request, socket, head) => {
 wss.on('connection', (ws, request, sessionId) => {
 	if (!sessions[sessionId]) {
 		console.log(`Creating new session with ID ${sessionId}`);
-		sessions[sessionId] = { clients: [], sessionData: { orders: [], articles: [], nextOrderNo: orderNo } };
+		/** @type {Session} */
+		const newSession = { clients: [], sessionData: { orders: [], articles: [], nextOrderNo: 1 } };
+		sessions[sessionId] = newSession;
 	}
 
 	ws.on('message', (message) => {
@@ -35,7 +36,7 @@ wss.on('connection', (ws, request, sessionId) => {
 	});
 
 	sessions[sessionId].clients.push(ws);
-	broadcastToSession(sessionId, 'sessionJoined');
+	broadcastToClients(sessionId, 'sessionJoined');
 });
 
 function handleWebSocketMessage(ws, data, sessionId) {
@@ -59,7 +60,7 @@ function handleUpdateArticles(sessionId, articles) {
 	const session = getSession(sessionId);
 	if (session) {
 		session.sessionData.articles = articles;
-		broadcastToSession(sessionId, 'updateArticles');
+		broadcastToClients(sessionId, 'updateArticles');
 	} else {
 		console.error(`Session ID ${sessionId} not found for updating articles.`);
 	}
@@ -69,8 +70,8 @@ function handleAddOrder(sessionId, cart) {
 	const session = getSession(sessionId);
 	if (session) {
 		session.sessionData.orders = session.sessionData.orders || [];
-		session.sessionData.orders.push({ id: uuidv4(), orderNo: orderNo++, articles: cart });
-		broadcastToSession(sessionId, 'updateOrders');
+		session.sessionData.orders.push({ id: uuidv4(), orderNo: session.sessionData.nextOrderNo++, articles: cart });
+		broadcastToClients(sessionId, 'updateOrders');
 	} else {
 		console.error(`Session ID ${sessionId} not found for completing cart.`);
 	}
@@ -80,19 +81,23 @@ function handleMarkOrderAsDone(sessionId, cartId) {
 	const session = getSession(sessionId);
 	if (session) {
 		session.sessionData.orders = session.sessionData.orders.filter((cart) => cart.id !== cartId);
-		broadcastToSession(sessionId, 'updateOrders');
+		broadcastToClients(sessionId, 'updateOrders');
 	} else {
 		console.error(`Session ID ${sessionId} not found for marking cart as done.`);
 	}
 }
 
+/**
+ * Get a session by its id
+ * @param {*} sessionId
+ * @returns {Session}
+ */
 function getSession(sessionId) {
 	return sessions[sessionId];
 }
 
-function broadcastToSession(sessionId, type) {
+function broadcastToClients(sessionId, type) {
 	const session = getSession(sessionId);
-	session.sessionData.nextOrderNo = orderNo;
 	session.clients.forEach((client) => {
 		if (client.readyState === WebSocket.OPEN) {
 			client.send(JSON.stringify({ sessionId, type, sessionData: session.sessionData }));
@@ -105,7 +110,15 @@ app.get('*', (req, res) => {
 });
 
 /**
+ * @typedef {Object} Session
+ * @property {Object[]}	clients
+ * @property {SessionData} sessionData
+ */
+
+/**
  * @typedef {Object} SessionData
+
  * @property {Object[]} orders
  * @property {Object[]} articles
+ * @property {number} nextOrderNo
  */
